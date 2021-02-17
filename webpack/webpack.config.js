@@ -1,5 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
@@ -20,6 +22,7 @@ module.exports = {
     new CleanWebpackPlugin(),
     // применять изменения только при горячей перезагрузке
     new webpack.HotModuleReplacementPlugin(),
+    new MiniCssExtractPlugin(),
   ],
   module: {
     rules: [
@@ -41,8 +44,8 @@ module.exports = {
       },
       // CSS, PostCSS, Sass
       {
-        test: /\.(scss|css)$/,
-        use: ["style-loader", "css-loader", "postcss-loader", "sass-loader"],
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
     ],
   },

@@ -1,4 +1,5 @@
 // import example from "./images/example.svg";
+import "./style.css";
 
 class Game {
   name = "Violin Charades";
