@@ -1,13 +1,20 @@
 {
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShepelVitalii2/virtual-keyboard"
+  },
   "scripts": {
     "build": "webpack",
-    "start": "webpack serve"
+    "start": "webpack serve",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "dependencies": {
     "eslint-config-airbnb": "^18.2.1",
     "postcss-preset-env": "^6.7.0",
     "style-loader": "^2.0.0"
   },
+  "homepage": "https://github.com/ShepelVitalii2/virtual-keyboard",
   "devDependencies": {
     "@babel/core": "^7.12.16",
     "@babel/preset-env": "^7.12.16",
