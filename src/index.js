@@ -1,5 +1,8 @@
 import './style.css';
 import { keyLayout, keyLayoutRus } from './js/keyLayoutData';
+// import { init } from './js/init';
+
+const main = document.createElement('div');
 
 const Keyboard = {
   elements: {
@@ -21,11 +24,11 @@ const Keyboard = {
 
   init() {
     //Create main element
-    this.elements.main = document.createElement('div');
+
     this.elements.keysContainer = document.createElement('div');
 
     //Setup main elements
-    this.elements.main.classList.add('keyboard', 'keyboard--hidden');
+    main.classList.add('keyboard', 'keyboard--hidden');
     this.elements.keysContainer.classList.add('keyboard__keys');
     this.elements.keysContainer.appendChild(this._createKeys());
 
@@ -34,8 +37,8 @@ const Keyboard = {
     );
 
     // add to DOM
-    this.elements.main.appendChild(this.elements.keysContainer);
-    document.body.appendChild(this.elements.main);
+    main.appendChild(this.elements.keysContainer);
+    document.body.appendChild(main);
 
     //Automatically use keyboard for elements
     document.querySelectorAll('.use-keyboard-input').forEach(element => {
@@ -46,7 +49,12 @@ const Keyboard = {
       });
     });
     document.onkeypress = function (e) {
-      Keyboard.properties.value += e.key;
+      const textArea = document.querySelector('.use-keyboard-input');
+      textArea.blur();
+
+      if (e.key !== 'Enter') {
+        Keyboard.properties.value += e.key;
+      }
 
       Keyboard._triggerEvent('oninput');
     };
@@ -60,6 +68,7 @@ const Keyboard = {
     };
 
     keyLayout.forEach((key, index) => {
+      // console.log(key);
       const keyElement = document.createElement('button');
       keyElement.dataset.keyCode = key;
       const insertLineBreak =
@@ -91,7 +100,7 @@ const Keyboard = {
           useSpaceBtn();
         }
 
-        if (keyElement.dataset.keyCode === e.key) {
+        if (keyElement.dataset.keyCode === e.key.toLowerCase()) {
           keyElement.classList.add('activeBtn');
         }
       });
@@ -111,7 +120,7 @@ const Keyboard = {
       };
 
       const useCapsLockBtn = () => {
-        this.properties.value = this._toggleCapsLock();
+        this._toggleCapsLock();
 
         keyElement.classList.toggle(
           'keyboard__key--active',
@@ -122,6 +131,7 @@ const Keyboard = {
       const useEnterBtn = () => {
         this.properties.value += '\n';
         this._triggerEvent('oninput');
+        console.log(this.properties.value);
       };
 
       const useSpaceBtn = () => {
@@ -220,7 +230,7 @@ const Keyboard = {
   _triggerEvent(handlerName) {
     if (typeof this.eventHandlers[handlerName] === 'function') {
       this.eventHandlers[handlerName](this.properties.value);
-      console.log(typeof this.eventHandlers[handlerName] === 'function');
+      // console.log(typeof this.eventHandlers[handlerName] === 'function');
     }
     // console.log(this.eventHandlers[handlerName](this.properties.value));
   },
@@ -259,14 +269,14 @@ const Keyboard = {
     this.properties.value = initialValue || '';
     this.eventHandlers.oninput = oninput;
     this.eventHandlers.onclose = onclose;
-    this.elements.main.classList.remove('keyboard--hidden');
+    main.classList.remove('keyboard--hidden');
   },
 
   close() {
     this.properties.value = '';
     this.eventHandlers.oninput = oninput;
     this.eventHandlers.onclose = onclose;
-    this.elements.main.classList.add('keyboard--hidden');
+    main.classList.add('keyboard--hidden');
   },
 
   _createKeysRus() {
@@ -311,6 +321,7 @@ const Keyboard = {
         if (keyElement.dataset.keyCode === e.key) {
           keyElement.classList.add('activeBtn');
         }
+        Keyboard.properties.value += e.key;
       });
 
       document.addEventListener('keyup', () => {
