@@ -107,6 +107,8 @@ const Keyboard = {
       });
 
       const useBackspaceBtn = () => {
+        console.log(this.properties.value.selectionStart);
+
         this.properties.value = this.properties.value.substring(
           0,
           this.properties.value.length - 1,
@@ -238,9 +240,9 @@ const Keyboard = {
 
   _changheLanguage() {
     if (!this.properties.language) {
-      return keyLayout[1];
-    } else {
       return keyLayout[0];
+    } else {
+      return keyLayout[1];
     }
   },
 
@@ -248,6 +250,7 @@ const Keyboard = {
     this.properties.capsLock = !this.properties.capsLock;
 
     for (const key of this.elements.keys) {
+      console.log(key.childElementCount);
       if (key.childElementCount === 0) {
         key.textContent = this.properties.capsLock
           ? key.textContent.toUpperCase()
