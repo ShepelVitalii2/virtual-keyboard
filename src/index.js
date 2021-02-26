@@ -1,6 +1,7 @@
 import './style.css';
 import { keyLayout } from './js/keyLayoutData';
 
+const text = document.getElementById('use-keyboard-input');
 const Keyboard = {
   elements: {
     main: null,
@@ -33,7 +34,8 @@ const Keyboard = {
     this.elements.keys = this.elements.keysContainer.querySelectorAll(
       '.keyboard__key',
     );
-    this.text = document.querySelector('textarea');
+
+    // console.log(this.text);
 
     // add to DOM
     this.elements.main.appendChild(this.elements.keysContainer);
@@ -50,8 +52,12 @@ const Keyboard = {
     document.onkeypress = function (e) {
       const textArea = document.querySelector('.use-keyboard-input');
       textArea.blur();
+      console.log(e);
 
       if (e.key !== 'Enter') {
+        if (text.selectionEnd !== Keyboard.properties.value.length) {
+          return;
+        }
         Keyboard.properties.value += e.key;
       }
 
@@ -84,6 +90,7 @@ const Keyboard = {
           keyElement.classList.add('activeBtn');
 
           useBackspaceBtn();
+          e.preventDefault();
         }
         if (e.code === 'CapsLock' && keyElement.dataset.keyCode === 'caps') {
           keyElement.classList.add('activeBtn');
@@ -100,25 +107,57 @@ const Keyboard = {
 
         if (keyElement.dataset.keyCode === e.key.toLowerCase()) {
           keyElement.classList.add('activeBtn');
+          // useRegularBtn();
+          // e.preventDefault();
+          // console.log(text.selectionEnd);
+          if (text.selectionEnd !== this.properties.value.length) {
+            const cursorAt = text.selectionStart;
+            insertText(key);
+            text.selectionStart = cursorAt + key.length;
+            text.selectionEnd = text.selectionStart;
+            Keyboard.properties.value = text.value;
+          }
         }
       });
 
-      document.addEventListener('keyup', () => {
+      document.addEventListener('keyup', e => {
         if (keyElement.dataset.keyCode === key) {
           keyElement.classList.remove('activeBtn');
         }
       });
 
+      function insertText(letter) {
+        const cursorAt = text.selectionStart;
+        // console.log(cursorAt);
+        // console.log(text.value.slice(text.selectionEnd));
+
+        text.value =
+          text.value.slice(0, cursorAt) +
+          letter +
+          text.value.slice(text.selectionEnd);
+
+        // text.selectionStart = cursorAt + letter.length;
+        // text.selectionEnd = text.selectionStart;
+        // Keyboard.properties.value = text.value;
+        // console.log(text.value);
+      }
+
       const useBackspaceBtn = () => {
-        const cursorAt = Math.max(0, this.text.selectionStart - 1);
+        // console.log();
+        // if (text.selectionStart !== this.properties.value.length) {
+        //   insertText(key);
+        // } else {
+        const cursorAt = Math.max(0, text.selectionStart - 1);
+        // console.log(text.selectionEnd);
+        // console.log(this.properties.value.length);
 
-        this.text.value =
-          this.text.value.slice(0, cursorAt) +
-          this.text.value.slice(this.text.selectionEnd);
+        text.value =
+          text.value.slice(0, cursorAt) + text.value.slice(text.selectionEnd);
 
-        this.text.selectionStart = cursorAt;
-        this.text.selectionEnd = this.text.selectionStart;
-        this.properties.value = this.text.value;
+        text.selectionStart = cursorAt;
+        text.selectionEnd = text.selectionStart;
+        this.properties.value = text.value;
+        // }
         // }
         // this.properties.value = this.properties.value.substring(
         //   0,
@@ -141,7 +180,7 @@ const Keyboard = {
       const useEnterBtn = () => {
         this.properties.value += '\n';
         this._triggerEvent('oninput');
-        console.log(this.properties.value);
+        // console.log(this.properties.value);
       };
 
       const useSpaceBtn = () => {
@@ -154,17 +193,30 @@ const Keyboard = {
         this._triggerEvent('onclose');
       };
 
-      // const useRegularBtn = () => {
-      //   // const cursorAt = 5;
-      //   this.text.selectionStart = this.text.selectionEnd;
-      //   this.text.selectionEnd = this.text.selectionStart;
-      //   this.properties.value = this.text.value;
-      //   console.log(this.properties.value.selectionStart);
-      //   this.properties.value += this.properties.capsLock
-      //     ? key.toUpperCase()
-      //     : key.toLowerCase();
-      //   this._triggerEvent('oninput');
-      // };
+      const useRegularBtn = () => {
+        // const cursorAt = Math.max(
+        //   this.properties.value.length,
+        //   this.text.selectionStart - 1,
+        // );
+        // // console.log(cursorAt.range);
+
+        // this.text.value =
+        //   this.text.value.slice(0, cursorAt) +
+        //   this.text.value.slice(this.text.selectionEnd);
+
+        // this.text.selectionStart = cursorAt;
+        // this.text.selectionEnd = this.text.selectionStart;
+        // this.properties.value = this.text.value;
+
+        // if (text.selectionStart !== this.properties.value.length) {
+        //   insertText(key);
+        // }
+
+        this.properties.value += this.properties.capsLock
+          ? key.toUpperCase()
+          : key.toLowerCase();
+        this._triggerEvent('oninput');
+      };
 
       switch (key) {
         case 'backspace':
@@ -227,7 +279,7 @@ const Keyboard = {
         default:
           keyElement.textContent = key.toLowerCase();
 
-          // keyElement.addEventListener('click', useRegularBtn);
+          keyElement.addEventListener('click', useRegularBtn);
 
           break;
       }
