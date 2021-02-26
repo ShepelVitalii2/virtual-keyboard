@@ -27,11 +27,13 @@ const Keyboard = {
     //Setup main elements
     this.elements.main.classList.add('keyboard', 'keyboard--hidden');
     this.elements.keysContainer.classList.add('keyboard__keys');
+
     this.elements.keysContainer.appendChild(this._createKeys());
 
     this.elements.keys = this.elements.keysContainer.querySelectorAll(
       '.keyboard__key',
     );
+    this.text = document.querySelector('textarea');
 
     // add to DOM
     this.elements.main.appendChild(this.elements.keysContainer);
@@ -80,6 +82,7 @@ const Keyboard = {
           keyElement.dataset.keyCode === 'backspace'
         ) {
           keyElement.classList.add('activeBtn');
+
           useBackspaceBtn();
         }
         if (e.code === 'CapsLock' && keyElement.dataset.keyCode === 'caps') {
@@ -107,13 +110,22 @@ const Keyboard = {
       });
 
       const useBackspaceBtn = () => {
-        console.log(this.properties.value.selectionStart);
+        const cursorAt = Math.max(0, this.text.selectionStart - 1);
 
-        this.properties.value = this.properties.value.substring(
-          0,
-          this.properties.value.length - 1,
-        );
-        this._triggerEvent('oninput');
+        this.text.value =
+          this.text.value.slice(0, cursorAt) +
+          this.text.value.slice(this.text.selectionEnd);
+
+        this.text.selectionStart = cursorAt;
+        this.text.selectionEnd = this.text.selectionStart;
+        this.properties.value = this.text.value;
+        // }
+        // this.properties.value = this.properties.value.substring(
+        //   0,
+        //   this.properties.value.length - 1,
+        // );
+
+        // this._triggerEvent('oninput');
       };
 
       const useCapsLockBtn = () => {
@@ -142,12 +154,17 @@ const Keyboard = {
         this._triggerEvent('onclose');
       };
 
-      const useRegularBtn = () => {
-        this.properties.value += this.properties.capsLock
-          ? key.toUpperCase()
-          : key.toLowerCase();
-        this._triggerEvent('oninput');
-      };
+      // const useRegularBtn = () => {
+      //   // const cursorAt = 5;
+      //   this.text.selectionStart = this.text.selectionEnd;
+      //   this.text.selectionEnd = this.text.selectionStart;
+      //   this.properties.value = this.text.value;
+      //   console.log(this.properties.value.selectionStart);
+      //   this.properties.value += this.properties.capsLock
+      //     ? key.toUpperCase()
+      //     : key.toLowerCase();
+      //   this._triggerEvent('oninput');
+      // };
 
       switch (key) {
         case 'backspace':
@@ -210,7 +227,7 @@ const Keyboard = {
         default:
           keyElement.textContent = key.toLowerCase();
 
-          keyElement.addEventListener('click', useRegularBtn);
+          // keyElement.addEventListener('click', useRegularBtn);
 
           break;
       }
@@ -232,7 +249,6 @@ const Keyboard = {
 
   _toggleLanguage() {
     this.properties.language = !this.properties.language;
-
     this.elements.keysContainer.innerHTML = ' ';
 
     this.elements.keysContainer.appendChild(this._createKeys());
@@ -250,7 +266,7 @@ const Keyboard = {
     this.properties.capsLock = !this.properties.capsLock;
 
     for (const key of this.elements.keys) {
-      console.log(key.childElementCount);
+      console.log(this.properties.capsLock);
       if (key.childElementCount === 0) {
         key.textContent = this.properties.capsLock
           ? key.textContent.toUpperCase()
