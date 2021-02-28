@@ -52,13 +52,14 @@ const Keyboard = {
     document.onkeypress = function (e) {
       const textArea = document.querySelector('.use-keyboard-input');
       textArea.blur();
-      console.log(e);
+      // console.log(e);
 
       if (e.key !== 'Enter') {
         if (text.selectionEnd !== Keyboard.properties.value.length) {
           return;
         }
         Keyboard.properties.value += e.key;
+        // console.log(Keyboard.properties.value);
       }
 
       Keyboard._triggerEvent('oninput');
@@ -90,6 +91,8 @@ const Keyboard = {
           keyElement.classList.add('activeBtn');
 
           useBackspaceBtn();
+          // Keyboard.properties.value += 'HELLO';
+          // console.log(Keyboard.properties.value);
           e.preventDefault();
         }
         if (e.code === 'CapsLock' && keyElement.dataset.keyCode === 'caps') {
@@ -127,19 +130,37 @@ const Keyboard = {
       });
 
       function insertText(letter) {
+        // if (letter === 'backspace') {
+        //   // letter = '';
+        //   const cursorAt = text.selectionStart;
+        //   text.value =
+        //     text.value.slice(0, cursorAt) +
+        //     '1' +
+        //     text.value.slice(text.selectionEnd);
+        //   console.log(letter);
+        // } else {
         const cursorAt = text.selectionStart;
-        // console.log(cursorAt);
-        // console.log(text.value.slice(text.selectionEnd));
-
-        text.value =
-          text.value.slice(0, cursorAt) +
-          letter +
-          text.value.slice(text.selectionEnd);
+        if (letter === 'backspace') {
+          const letter = '';
+          letter.length = 1;
+          text.value =
+            text.value.slice(0, cursorAt) +
+            letter +
+            text.value.slice(text.selectionEnd);
+          console.log(letter);
+        } else {
+          text.value =
+            text.value.slice(0, cursorAt) +
+            letter +
+            text.value.slice(text.selectionEnd);
+          // console.log(text.value.slice(0, cursorAt));
+        }
 
         // text.selectionStart = cursorAt + letter.length;
         // text.selectionEnd = text.selectionStart;
         // Keyboard.properties.value = text.value;
         // console.log(text.value);
+        // this._triggerEvent('oninput');
       }
 
       const useBackspaceBtn = () => {
@@ -157,6 +178,7 @@ const Keyboard = {
         text.selectionStart = cursorAt;
         text.selectionEnd = text.selectionStart;
         this.properties.value = text.value;
+        // console.log(text.value);
         // }
         // }
         // this.properties.value = this.properties.value.substring(
