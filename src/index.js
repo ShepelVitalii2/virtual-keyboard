@@ -124,9 +124,20 @@ class Keyboard {
 
           keyElement.addEventListener('click', () => {
             text.focus();
+            const cursorAt = text.selectionStart;
             this.properties.value = text.value;
             this.properties.value += '\n';
             text.value = this.properties.value;
+
+            if (cursorAt !== text.value.length - 1) {
+              text.value =
+                text.value.slice(0, cursorAt - 1) +
+                '\n' +
+                text.value.slice(cursorAt);
+              text.selectionStart = cursorAt;
+              text.selectionEnd = text.selectionStart;
+              keyboard.properties.value = text.value;
+            }
           });
 
           break;
@@ -240,29 +251,6 @@ class Keyboard {
     keyboard.properties.value = text.value;
   }
 
-  insertText2(e) {
-    // console.log(e);
-    text.focus();
-    let key = keyboard.properties.isRussian === true ? e[0] : e[1];
-    const cursorAt = text.selectionStart;
-
-    if (!Array.isArray(e)) {
-      text.value =
-        text.value.slice(0, cursorAt) + e + text.value.slice(text.selectionEnd);
-    }
-    if (Array.isArray(e)) {
-      text.value =
-        text.value.slice(0, cursorAt) +
-        key +
-        text.value.slice(text.selectionEnd);
-    }
-
-    //Определяем где находится курсор
-    text.selectionStart = cursorAt + 1;
-    text.selectionEnd = text.selectionStart;
-    keyboard.properties.value = text.value;
-  }
-
   initReal() {
     document.addEventListener('keydown', event => {
       const key = document.querySelector(`button[data-key='${event.code}']`);
@@ -293,7 +281,21 @@ class Keyboard {
           return;
 
         case 'Enter':
-          document.querySelector('.use-keyboard-input').value += '\n';
+          // document.querySelector('.use-keyboard-input').value += '\n';
+          const cursorPos = text.selectionStart;
+          this.properties.value = text.value;
+          this.properties.value += '\n';
+          text.value = this.properties.value;
+
+          if (cursorPos !== text.value.length - 1) {
+            text.value =
+              text.value.slice(0, cursorPos - 1) +
+              '\n' +
+              text.value.slice(cursorPos);
+            text.selectionStart = cursorPos;
+            text.selectionEnd = text.selectionStart;
+            keyboard.properties.value = text.value;
+          }
           break;
 
         case 'ShiftLeft':
