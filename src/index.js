@@ -21,7 +21,7 @@ class Keyboard {
   initTextarea() {
     this.elements.textarea = document.createElement('textarea');
     this.elements.textarea.classList.add('use-keyboard-input');
-
+    this.elements.textarea.id = 'text';
     document.body.appendChild(this.elements.textarea);
   }
 
@@ -57,7 +57,7 @@ class Keyboard {
     const createIconHTML = icon_name => {
       return `<i class="material-icons">${icon_name}</i>`;
     };
-    const text = document.querySelector('.use-keyboard-input');
+    const text = document.getElementById('text');
 
     keyLayout.forEach(key => {
       const keyElement = document.createElement('button');
@@ -70,81 +70,47 @@ class Keyboard {
       // Every button have date attribute(with code)
       keyElement.setAttribute('data-key', `${key[2]}`);
 
-      function insertText(key) {
-        keyboard.elements.textarea = text;
-        const cursorAt = text.selectionStart;
-        console.log(key);
-
-        text.value =
-          text.value.slice(0, cursorAt) +
-          key +
-          text.value.slice(text.selectionEnd);
-
-        text.selectionStart = cursorAt + key.length;
-        text.selectionEnd = text.selectionStart;
-      }
-
-      function pressBackspace() {
-        keyboard.elements.textarea = text;
+      function insertText(e) {
+        // text.focus();
         const cursorAt = Math.max(0, text.selectionStart - 1);
-
+        console.log(e);
+        console.log('12312312');
         text.value =
           text.value.slice(0, cursorAt) +
-          insertText(key) +
+          e +
           text.value.slice(text.selectionEnd);
 
+        //Определяем где находится курсор
         text.selectionStart = cursorAt;
         text.selectionEnd = text.selectionStart;
-        console.log(text.value);
+        keyboard.properties.value = text.value;
       }
 
-      // function insertText(letter) {
-      //   const cursorAt = text.selectionStart;
-      //   if (letter === 'backspace') {
-      //     // const letter = '';
-      //     letter.length = 1;
-      //     console.log(letter.length);
-      //     text.value =
-      //       text.value.slice(0, cursorAt) +
-      //       letter +
-      //       text.value.slice(text.selectionEnd);
-      //     console.log(letter);
-      //   } else {
-      //     text.value =
-      //       text.value.slice(0, cursorAt) +
-      //       letter +
-      //       text.value.slice(text.selectionEnd);
-      //   }
-      // }
+      function pressBackspace(e) {
+        //Что бы значение нахождения курсора в начале и в конце при нажатии бкспйс не обнулялось
+        text.focus();
 
-      function backspaceAtCursor() {
-        // keyboard.elements.textarea = document.getElementById(id);
-        // console.log(keyboard.properties.value);
-        console.log(keyboard.elements.textarea.selectionEnd);
-        console.log(keyboard.elements.textarea.selectionStart);
-        const field = keyboard.elements.textarea.value;
-        // console.log(field.selectionStart);
+        //Значение буквы
+        key = e.target.textContent;
+        //Значение строки
+        console.log('text value : ' + text.value);
 
-        if (field.selectionStart) {
-          const startPos = this.elements.textarea.selectionStart;
-          const endPos = this.elements.textarea.selectionEnd;
+        //Где находится курсор
+        const cursorAt = Math.max(0, text.selectionStart - 1);
+        // console.log('cursorAt : ' + cursorAt);
+        //длинна строки
+        // console.log('text.value.length : ' + text.value.length);
+        // где заканчивается куроср
+        // console.log('text.selectionEnd : ' + text.selectionEnd);
 
-          if (field.selectionStart == field.selectionEnd) {
-            field.value =
-              field.value.substring(0, startPos - 1) +
-              field.value.substring(endPos, field.value.length);
+        //Соединяем две строки в -1 символ.
+        text.value =
+          text.value.slice(0, cursorAt) + text.value.slice(text.selectionEnd);
 
-            field.focus();
-            field.setSelectionRange(startPos - 1, startPos - 1);
-          } else {
-            field.value =
-              field.value.substring(0, startPos) +
-              field.value.substring(endPos, field.value.length);
-
-            field.focus();
-            field.setSelectionRange(startPos, startPos);
-          }
-        }
+        //Определяем где находится курсор
+        text.selectionStart = cursorAt;
+        text.selectionEnd = text.selectionStart;
+        keyboard.properties.value = text.value;
       }
 
       switch (key[0]) {
@@ -327,7 +293,7 @@ class Keyboard {
           keyLayout.forEach(item => {
             if (item[2] === event.code) {
               // english
-              if (!this.properties.isRrussian) {
+              if (!this.properties.isRussian) {
                 if (!this.properties.capsLock) {
                   text.value += item[0].toLowerCase();
                 }
@@ -384,7 +350,7 @@ class Keyboard {
     runOnKeys(
       () => {
         setTimeout(() => {
-          this.properties.isRrussian = !this.properties.isRrussian;
+          this.properties.isRussian = !this.properties.isRussian;
 
           document.querySelector('.keyboard').remove();
           this.initVirtual();
@@ -400,10 +366,10 @@ const keyboard = new Keyboard();
 
 window.addEventListener('DOMContentLoaded', () => {
   if (localStorage.getItem('lang') === 'false') {
-    keyboard.properties.isRrussian = false;
+    keyboard.properties.isRussian = false;
   }
   if (localStorage.getItem('lang') === 'true') {
-    keyboard.properties.isRrussian = true;
+    keyboard.properties.isRussian = true;
   }
   keyboard.initTextarea();
   keyboard.initVirtual();
