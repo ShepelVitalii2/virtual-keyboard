@@ -166,37 +166,29 @@ class Keyboard {
           keyElement.innerHTML = createIconHTML('space_bar');
 
           keyElement.addEventListener('click', () => {
-            this.properties.value = document.querySelector(
-              '.use-keyboard-input',
-            ).value;
-            this.properties.value += ' ';
-            text.value = this.properties.value;
+            text.focus();
+
+            const cursorAt = text.selectionStart;
+            text.value =
+              text.value.slice(0, cursorAt) + ' ' + text.value.slice(cursorAt);
+            text.selectionStart = 1 + cursorAt;
+            text.selectionEnd = text.selectionStart;
           });
 
           break;
 
         default: {
           let [, languageLetter] = key;
+          // console.log(key);
 
           if (!this.properties.isRussian) {
             [languageLetter] = key;
+            // console.log(key);
           }
           keyElement.textContent = languageLetter.toLowerCase();
 
           keyElement.addEventListener('click', () => {
-            this.properties.value = text.value;
-            this.properties.value += languageLetter.toLowerCase();
-
-            if (this.properties.capsLock) {
-              this.properties.value = text.value;
-              this.properties.value += languageLetter.toUpperCase();
-            }
-
-            if (text.selectionStart !== text.value.length) {
-              this.insertText(key);
-            }
-
-            text.value = this.properties.value;
+            this.insertText(key);
           });
 
           break;
@@ -240,10 +232,20 @@ class Keyboard {
         text.value.slice(0, cursorAt) + e + text.value.slice(text.selectionEnd);
     }
     if (Array.isArray(e)) {
-      text.value =
-        text.value.slice(0, cursorAt) +
-        key +
-        text.value.slice(text.selectionEnd);
+      if (!this.properties.capsLock) {
+        text.value =
+          text.value.slice(0, cursorAt) +
+          key +
+          text.value.slice(text.selectionEnd);
+        // console.log(text.value);
+      }
+
+      if (this.properties.capsLock) {
+        text.value =
+          text.value.slice(0, cursorAt) +
+          key.toUpperCase() +
+          text.value.slice(text.selectionEnd);
+      }
     }
 
     text.selectionStart = cursorAt + 1;
@@ -281,7 +283,6 @@ class Keyboard {
           return;
 
         case 'Enter':
-          // document.querySelector('.use-keyboard-input').value += '\n';
           const cursorPos = text.selectionStart;
           this.properties.value = text.value;
           this.properties.value += '\n';
@@ -310,7 +311,14 @@ class Keyboard {
           break;
 
         case 'Space':
-          document.querySelector('.use-keyboard-input').value += ' ';
+          text.focus();
+
+          const cursor = text.selectionStart;
+          text.value =
+            text.value.slice(0, cursor) + ' ' + text.value.slice(cursor);
+          text.selectionStart = 1 + cursor;
+          text.selectionEnd = text.selectionStart;
+          keyboard.properties.value = text.value;
           break;
 
         default:
